@@ -156,6 +156,21 @@ const Joi = require('joi');
     return HeadSchema.validate(datas);
   }
 
+  const Productvalidation = (data) => {
+    const schema = Joi.object({
+      name: Joi.string().required(),
+      email: Joi.string().email().required(),
+      companyname: Joi.string().required(),
+      Eid: Joi.string().required(),
+      Description: Joi.string().required(),
+      contactpersonname: Joi.string().required(),
+      quantity: Joi.number().required(),
+      productname: Joi.string().required(),
+      Employeeid: Joi.string().required(),
+    });
+    return schema.validate(data);
+  };
+
   module.exports.loginvalidation = loginvalidation;
   module.exports.registervalidation = registervalidation;
   module.exports.headregistervalidation = headregistervalidation;
@@ -164,3 +179,4 @@ const Joi = require('joi');
   module.exports.ResetPasswordvalidation = ResetPasswordvalidation;
   module.exports.Headvalidation = Headvalidation;
   module.exports.emailvalidation = emailvalidation;
+  module.exports.Productvalidation = Productvalidation;

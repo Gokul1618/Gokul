@@ -24,11 +24,11 @@ const InventorySchema = new mongoose.Schema({
             required: true
         },
         Inward: {
-            type: Number,
+            type: String,
             required: true
         },
         Outward: {
-            type: Number,
+            type: String,
             required: true
         },
         Current: {
@@ -37,4 +37,4 @@ const InventorySchema = new mongoose.Schema({
         }
     }, { timestamps: true });
 
-module.exports = mongoose.model('Inventory', InventorySchema);
+module.exports = mongoose.model('Inventory2', InventorySchema);

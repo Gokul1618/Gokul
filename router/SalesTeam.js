@@ -796,18 +796,26 @@ router.get('/getsalesheadEid',verifyToken,async(req,res)=>{
         return res.status(500).json({ message: 'Internal server error', error: err.message || err });
     }
 });
-router.get('/getsalesemployeeEid',verifyToken,async(req,res)=>{
-    try{
-        const getallEid = await  CommonTeam.find({role: 'Sales Employee'});
-        if(!getallEid){
-          res.status(400).json({message:'No data found'});
-        } 
-         return res.status(200).json({message:'sucessfully getted data',getallEid});
-    }catch(err){
-        console.error("Error:", err);
-        return res.status(500).json({ message: 'Internal server error', error: err.message || err });
+router.get('/getsalesemployeeEid', verifyToken, async (req, res) => {
+    try {
+      const getallEid = await CommonTeam.find({ role: 'Sales Employee' }).select('Eid');
+      
+      if (!getallEid || getallEid.length === 0) {
+        return res.status(400).json({ message: 'No data found' });
+      }
+  
+      // Map the data to return only the Eid values as an array.
+      const eids = getallEid.map(e => e.Eid);
+  
+      // Return the array directly without wrapping it in an object.
+      return res.status(200).json(eids);
+    } catch (err) {
+      console.error("Error:", err);
+      return res.status(500).json({ message: 'Internal server error', error: err.message || err });
     }
-});
+  });
+  
+
 router.get('/salesheadviewallprofile',verifyToken,async(req,res)=>{
     if (req.user.role === 'sales head') {
         return res.status(403).json({
@@ -882,6 +890,7 @@ router.post('/service&project', verifyToken, upload.single('File'), async (req, 
         });
     }
 });
+
 router.post('/productrequest', verifyToken, async (req, res) => {
     
     console.log("req.body:", req.body);  
@@ -919,31 +928,59 @@ router.post('/productrequest', verifyToken, async (req, res) => {
             contactpersonname,
             quantity,
             productname,
-            Status: 'products-status',
-            
-        });
+            Status: 'products-status',   });
 
-        const savedEmployee = await newWork.save();
+            const savedEmployee = await newWork.save();
+    
+            return res.status(200).json({
+                message: "Registration Successful",
+                user: {
+                    name: savedEmployee.name,
+                    email: savedEmployee.email,
+                    Eid: savedEmployee.Eid,
+                    Description: savedEmployee.Description,
+                    Employeeid: savedEmployee.Employeeid
+                }
+            });
+    
+        } catch (error) {
+            return res.status(500).json({
+                message: error.message
+            });
+        }
+    });
+    
+    
+    
 
+
+   // Assuming you're using Express.js for routing
+router.get('/getUserData/:Eid', verifyToken, async (req, res) => {
+    const { Eid } = req.params;  // Capture the Eid from the URL path
+    
+    try {
+        const user = await Productrequest.findOne({ Eid });  // Find user by Eid
+    
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+    
         return res.status(200).json({
-            message: "Registration Successful",
-            user: {
-                name: savedEmployee.name,
-                email: savedEmployee.email,
-                Eid: savedEmployee.Eid,
-                Description: savedEmployee.Description,
-                Employeeid: savedEmployee.Employeeid
-            }
+            name: user.name,
+            email: user.email,
+            Eid: user.Eid,
+            Description: user.Description,
+            quantity: user.quantity,
+            productname: user.productname
         });
-
     } catch (error) {
         return res.status(500).json({
             message: error.message
         });
     }
 });
-
-
 
 
 router.get('/headenquiry', verifyToken, async (req, res) => {
